@@ -189,3 +189,16 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+
+//实用的快捷方式
+.all-margin-top-15{
+  margin-top: 15px;
+}
+.all-margin-left-15{
+  margin-top: 15px;
+}
+
+.all-center{
+   display: flex;
+   justify-content: center;
+}
