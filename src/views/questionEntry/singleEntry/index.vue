@@ -1,5 +1,5 @@
 <template>
-   <div>"单个问题录入"</div>
+   <div class="app-container">"单个问题录入"</div>
 </template>
 
 <script>

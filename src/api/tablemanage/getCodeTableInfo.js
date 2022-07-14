@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getCodeTable(){
     return request({
-        url: '/codetable/getcodetable',
+        url: `/codetable/getcodetable`,
         method: 'get'
     })
 }
@@ -20,5 +20,14 @@ export function deleteCodeTable(data){
     return request({
         url: `/codetable/delitemvalue?dictionaryTypeName=${data.dictionaryTypeName}&dictionaryItemValue=${data.dictionaryItemValue}`,
         method: 'delete',
+    })
+}
+
+export function excelCodeTable(data){
+    
+    return request({
+        url: '/excel/codetable',
+        method: 'post',
+        data:JSON.stringify(data)
     })
 }

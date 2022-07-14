@@ -20,12 +20,14 @@
        </template>
     </el-table-column>
     </el-table>
-      <el-row class="all-margin-top-15  all-center"> <el-button icon="el-icon-download" type="success" @click="handleExport"  size="mini" > 导出Excel</el-button> </el-row>
+         
+
+      <el-row class="all-margin-top-15  all-center"> <el-button icon="el-icon-download" type="success" @click="handleExport"  size="mini" > 导出模板</el-button> </el-row>
    </div>
 </template>
 
 <script>
-import {getCodeTable} from '@/api/tablemanage/getCodeTableInfo'
+import {getCodeTable,excelCodeTable} from '@/api/tablemanage/getCodeTableInfo'
 export default {
    name:'TableManage',
     dicts: ['sys_normal_disable'],
@@ -36,6 +38,8 @@ export default {
        loading:true,
       //码表数据
        codeTableData:[],
+         
+     
     }
    },
    created(){
@@ -48,13 +52,14 @@ export default {
     async getCodeList(){
         this.loading = true
         try {
-             const res = await getCodeTable()
-        this.codeTableData = res.rows.map((item)=>{
+             const res = await getCodeTable(this.queryParams)
+        this.codeTableData = res.data.map((item)=>{
             return{
                 selectCodeTable:[],
                 ...item
             }
         })
+         
         this.loading = false
         } catch (error) {
          this.loading = false
@@ -62,7 +67,7 @@ export default {
        
     },
      //导出信息
-    handleExport(){
+   async handleExport(){
         //选择装的数据
         let tempArr = []
         this.codeTableData.forEach(item=>{
@@ -71,7 +76,17 @@ export default {
                 selectCodeTable:[...item.selectCodeTable]
             })
         })
-        console.log(tempArr)
+   
+       
+      const res =   await excelCodeTable({
+        sheetName:"表格",
+        data:tempArr
+   }) 
+      console.log(res)
+     
+       
+      
+        // console.log(tempArr)
         this.getCodeList()
     }
 

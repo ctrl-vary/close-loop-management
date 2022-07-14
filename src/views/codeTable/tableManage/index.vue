@@ -43,6 +43,7 @@
     </el-table-column>
     </el-table>
       </el-row>
+  
 
     
 <el-dialog
@@ -84,7 +85,8 @@ export default {
         dictionaryTypeName:"",
         //字典项
         dictionaryItemValue:""
-      }
+      },
+    
     }
    },
 
@@ -96,9 +98,9 @@ export default {
   async  getCodeList(){
      try {
       this.loading = true
-      const res = await getCodeTable()
+      const res = await getCodeTable(this.queryParams)
         console.log(res)
-        this.codeTableData = res.rows
+        this.codeTableData = res.data
         this.loading = false 
      } catch (error) {
       this.loading = false 
@@ -117,6 +119,7 @@ export default {
         dictionaryTypeName:this.addNewCodeItemForm.dictionaryTypeName,
         dictionaryItemValue:this.addNewCodeItemForm.dictionaryItemValue
       })
+      this.addNewCodeItemForm.dictionaryItemValue = ""
       this.getCodeList()
        this.addCodeTableDialogVisible = false
     },
