@@ -23,11 +23,11 @@ export function deleteCodeTable(data){
     })
 }
 
-export function excelCodeTable(data){
-    
+export function excelCodeTable(excelData){
     return request({
         url: '/excel/codetable',
         method: 'post',
-        data:JSON.stringify(data)
+        data: JSON.stringify(excelData) ,
+        responseType: 'blob'  //后端传的数据流，必须加这个
     })
 }

@@ -28,6 +28,9 @@
 
 <script>
 import {getCodeTable,excelCodeTable} from '@/api/tablemanage/getCodeTableInfo'
+import {excelTest} from '@/utils/request'
+import { tansParams, blobValidate } from "@/utils/ruoyi";
+import { type } from 'os';
 export default {
    name:'TableManage',
     dicts: ['sys_normal_disable'],
@@ -45,6 +48,9 @@ export default {
    created(){
         this.getCodeList()
    },
+   mounted(){
+       this.getCodeList()
+   },
    methods:{
     
     
@@ -52,7 +58,7 @@ export default {
     async getCodeList(){
         this.loading = true
         try {
-             const res = await getCodeTable(this.queryParams)
+             const res = await getCodeTable()
         this.codeTableData = res.data.map((item)=>{
             return{
                 selectCodeTable:[],
@@ -68,6 +74,7 @@ export default {
     },
      //导出信息
    async handleExport(){
+     
         //选择装的数据
         let tempArr = []
         this.codeTableData.forEach(item=>{
@@ -77,17 +84,31 @@ export default {
             })
         })
    
-       
-      const res =   await excelCodeTable({
+  
+   const res =   await excelCodeTable({
         sheetName:"表格",
         data:tempArr
    }) 
-      console.log(res)
-     
-       
-      
-        // console.log(tempArr)
-        this.getCodeList()
+        const content = res
+        
+        const blob = new Blob([content])
+        const fileName = '模板.xlsx'
+        if ('download' in document.createElement('a')) {
+          // 非IE下载
+          const elink = document.createElement('a')
+          elink.download = fileName
+          elink.style.display = 'none'
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href) // 释放URL 对象
+          document.body.removeChild(elink)
+        } else {
+          // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+        //  console.log(res)
+    // this.getCodeList()
     }
 
    }

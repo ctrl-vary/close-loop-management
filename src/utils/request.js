@@ -68,6 +68,7 @@ service.interceptors.request.use(config => {
 // 响应拦截器
 service.interceptors.response.use(res => {
     // 未设置状态码则默认成功状态
+   
     const code = res.data.code || 200;
     // 获取错误信息
     const msg = errorCode[code] || res.data.msg || errorCode['default']
@@ -155,4 +156,11 @@ export function download(url, params, filename) {
   })
 }
 
+export function excelTest(url,params){
+  return service.post(url, params, {
+    // transformRequest: [(params) => { return tansParams(params) }],
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob'
+  })
+}
 export default service
