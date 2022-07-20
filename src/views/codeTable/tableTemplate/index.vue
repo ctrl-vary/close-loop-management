@@ -47,13 +47,14 @@ export default {
    },
    created(){
         this.getCodeList()
+       
    },
-   mounted(){
+   //缓存组件的加载
+   activated(){
        this.getCodeList()
+ console.log("刷新")
    },
    methods:{
-    
-    
       // 获取所有码表的信息
     async getCodeList(){
         this.loading = true
@@ -107,8 +108,8 @@ export default {
           // IE10+下载
           navigator.msSaveBlob(blob, fileName)
         }
-        //  console.log(res)
-    // this.getCodeList()
+     //  console.log(res)
+    this.getCodeList()
     }
 
    }

@@ -7,25 +7,10 @@
           plain
           icon="el-icon-plus"
           size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:dept:add']"
+          @click="resetTable"
           >重置表单</el-button
         >
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
-          plain
-          icon="el-icon-sort"
-          size="mini"
-          @click="toggleExpandAll"
-          >展开/折叠</el-button
-        >
-      </el-col>
-      <right-toolbar
-        :showSearch.sync="showSearch"
-        @queryTable="getList"
-      ></right-toolbar>
     </el-row>
     <el-row>
       <el-table v-loading="loading" :data="codeTableData">
@@ -38,7 +23,13 @@
         </el-table-column>
         <el-table-column label="问题项" min-width="300" align="left">
           <template slot-scope="scope">
-            <div v-if="scope.row.dictionaryItem">
+            <div v-if="scope.row.isTime"> 
+             <el-date-picker
+      v-model="scope.row.fillVal"
+      type="date"
+      placeholder="选择日期">
+    </el-date-picker></div>
+            <div v-else-if="scope.row.dictionaryItem">
               <el-select v-model="scope.row.fillVal" placeholder="请选择">
                 <el-option
                   v-for="(dictitem, index) in scope.row.dictionaryItem"
@@ -58,19 +49,29 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-row class="all-margin-top-15 all-center" > <el-button size="mini" type="primary">开始录入</el-button> </el-row>
+    <el-row class="all-margin-top-15 all-center" > <el-button size="mini" @click="questionFormDialogVisible=true"  type="primary">开始录入</el-button> </el-row>
      
  <el-dialog
-   title="表单预览"
+   title="问题预览"
    :visible.sync="questionFormDialogVisible"
-   width="30%"
+   width="50%"
+  
  >
-  <el-form>
-    <el-form-item label="新增字典项:"> <el-input v-model="addNewCodeItemForm.dictionaryItemValue"></el-input> </el-form-item>
+  <el-form  label-width="120px">
+    <el-form-item v-for="(item,index) in codeTableData" :label="item.dictionaryTypeName+':'" :key="index"> 
+    <el-date-picker
+    v-if="item.isTime"
+      disabled
+      v-model="item.fillVal"
+      type="date"
+       />
+    <el-input v-else disabled v-model="item.fillVal"></el-input>
+    
+    </el-form-item>
   </el-form>
   <span slot="footer" class="dialog-footer">
-    <el-button @click="addCodeTableDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="btnAddDictionaryItem">确 定</el-button>
+    <el-button @click="questionFormDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="btnQuestionFormAdd">确 定</el-button>
   </span>
 </el-dialog>
 
@@ -81,18 +82,21 @@
 <script>
 import {
   getCodeTable,
-  addCodeTable,
-  deleteCodeTable,
 } from "@/api/tablemanage/getCodeTableInfo";
+import Cookies from "js-cookie";
+import getStrName from '@/utils/dataConversion/index.js'
+import {parseTime} from '@/utils/ruoyi'
+import {addNewProblem} from '@/api/entrymanage/index'
 export default {
   data() {
     return {
+      
       //加载
       loading: true,
       //码表数据
       codeTableData: [],
       //对话框
-      addCodeTableDialogVisible: false,
+      questionFormDialogVisible: false,
       //增加码表项
       addNewCodeItemForm: {
         //字典名
@@ -104,13 +108,22 @@ export default {
       otherCodeTable: [
         {
           dictionaryTypeName: "检查名称",
+          
         },
         {
           dictionaryTypeName: "问题关键词",
+          
         },
         {
           dictionaryTypeName: "问题描述",
+          
         },
+        {
+          dictionaryTypeName:"期望完成时间",
+         
+          isTime:true
+          
+        }
       ],
     };
   },
@@ -118,34 +131,80 @@ export default {
   created() {
     this.getCodeList();
   },
+  activated(){
+    this.getCodeList();
+  },
   methods: {
     // 获取所有码表的信息
     async getCodeList() {
       try {
+        // console.log(Cookies.get('username'))
         this.loading = true;
         const res = await getCodeTable(this.queryParams);
-        console.log(res);
-         //数据处理去掉null的值
+      
+         //数据处理去掉null的值 dictionaryItem.dictionaryItemValue=null的情况
         let tempArr = res.data.map(item=>{
          return {
            dictionaryTypeName: item.dictionaryTypeName,
-           dictionaryItem:item.dictionaryItem.filter(val=>!!val.dictionaryItemValue)
+           dictionaryItem:item.dictionaryItem.filter(val=>!!val.dictionaryItemValue),
+           
          }
         })
-        console.log(tempArr)
+        
         this.codeTableData = this.otherCodeTable
           .concat(tempArr)
           .map((item) => {
             return {
               ...item,
-              fillVal: "",
+              strName:getStrName(item.dictionaryTypeName),
+              fillVal: "", //填入的值
             };
           });
         this.loading = false;
+        console.log(this.codeTableData)
       } catch (error) {
         this.loading = false;
       }
     },
+
+    resetTable(){
+        this.codeTableData.forEach(item => {
+          item.fillVal = ""
+        });
+    },
+    btnQuestionFormAdd(){
+      let addForm = {
+        userName:Cookies.get('username')
+      }
+      this.codeTableData.forEach(item=>{
+        if(item.isTime){
+          addForm[item.strName] = parseTime(item.fillVal,"{yy}-{mm}-{dd}")
+        }else{
+          addForm[item.strName] = item.fillVal
+        }
+      })
+      let ss = {
+        according: "西南油田手册",
+        category: "生产运行",
+        cause: "原因2",
+        checkName: "6546",
+        keyWord: "6546",
+        level: "级别3",
+        planEndTime: "2022-07-13",
+        quesDept: "成都总站",
+        quesDesc: "54",
+        seriousLevel: "严重",
+        userName: "SCadmin",
+
+      }
+      
+      addNewProblem(ss).then(msg=>{
+        console.log(msg)
+      },err=>{
+        console.log(err+"错误了")
+      })
+    }
+
   },
 };
 </script>

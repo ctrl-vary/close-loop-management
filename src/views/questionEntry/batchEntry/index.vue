@@ -7,9 +7,7 @@
               plain
               icon="el-icon-edit"
               size="mini"
-              :disabled="single"
-              @click="handleUpdate"
-            
+             
             >修改</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -18,9 +16,7 @@
               plain
               icon="el-icon-delete"
               size="mini"
-              :disabled="multiple"
-              @click="handleDelete"
-             
+           
             >删除</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -30,7 +26,6 @@
               icon="el-icon-upload2"
               size="mini"
               @click="btnOpenUploadDialog"
-             
             >批量导入</el-button>
           </el-col>
           <el-col :span="1.5">
@@ -39,10 +34,8 @@
               plain
               icon="el-icon-download"
               size="mini"
-              @click="handleExport"
             >模板下载</el-button>
           </el-col>
-          <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
     批量问题录入
 
@@ -51,17 +44,19 @@
   :visible.sync="upLoadDialogVisible"
   width="30%"
  >
+ <!-- 文件上传 -->
    <el-upload
   class="upload-demo"
-  ref="upload"
+  ref="excelUpload"
   action="#"
+  :file-list="fileList"
   drag
   :limit="1"
   :on-exceed="limitHandle"
   :on-remove="handleRemove"
-  :before-upload="beforeUploadHandle"
-  :file-list="fileList"
-  :auto-upload="false">
+  :on-change="changeUploadHandle"
+  :auto-upload="false"
+  >
    <i class="el-icon-upload"></i>
   <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
   <div slot="tip" class="el-upload__tip">只能上传.xlxs/.xls文件，且不超过500kb</div>
@@ -75,11 +70,13 @@
 </template>
 
 <script>
+import xlsx from 'xlsx';
 export default {
    data(){
     return{
       //上传对话框
-       upLoadDialogVisible:false
+       upLoadDialogVisible:false,
+       fileList:[]
     }
    },
    created(){
@@ -89,20 +86,31 @@ export default {
      //导入对话框
     btnOpenUploadDialog(){
           this.upLoadDialogVisible = true
-
+         
     },
     //确认上传
     btnConfirmUpload(){
-        
+        alert("上传成功")
     },
     //上传
-    beforeUploadHandle(file){
-          console.log(file)
+    changeUploadHandle(file,filelist){
+      //判断是否是这个类型的文件
+     if(this.RegXlsxFile(file.name)) {
+         this.handleTheFile(file.raw)
+     }else{
+      this.$message({
+        type:"error",
+        message:"只能传.xls/.xlxs/.csv文件"
+       })
+       this.$refs.excelUpload.clearFiles()
+     }
+        
+        
     },
     limitHandle(files, fileList){
        this.$message({
         type:"error",
-        message:"一次只能传一个数值"
+        message:"一次只能传一个Excel表格"
        })
     },
     handleRemove(file, fileList){
@@ -111,7 +119,35 @@ export default {
           message:"移除成功！"
           
          })
+    },
+    RegXlsxFile(fileName){
+      return /\.(xlsx|xls|csv)$/.test(fileName)
+    },
+
+    handleTheFile(file){
+    
+         //文件解析
+      new Promise((resolve,reject)=>{
+        let reader = new  FileReader()
+        //二进制读取
+        reader.readAsBinaryString(file)
+        //读取成功后在onload里面执行
+        reader.onload = ev =>{
+          resolve(ev.target.result)
+        }
+      }).then((binaryData)=>{
+        
+        //插件读取二进制数据
+        let workbook =  xlsx.read(binaryData,{type:'binary'})
+        console.log(workbook)
+        //获取指定的表格
+        let worksheet = workbook.Sheets[workbook.SheetNames[0]]
+        //调用提供的Api转化为Josn数据
+        let jsonData = xlsx.utils.sheet_to_json(worksheet)
+        console.log(jsonData)
+      })
     }
+
    }
 }
 </script>
