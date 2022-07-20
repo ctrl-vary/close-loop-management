@@ -1,15 +1,14 @@
 import request from '@/utils/request'
 
 //单个问题录入
-export function addNewProblem(form){
-    console.log(form)
+export function addNewProblem(data){
+    console.log(data)
     return request({
         url: '/problem/addOne',
         method: 'post',
-        data:JSON.stringify(form),
+        data:JSON.stringify(data),
     })
 }
-
 //查询本人所有暂存问题
 export function getAllTempQuestion(UserName){
     return request({
@@ -19,9 +18,12 @@ export function getAllTempQuestion(UserName){
 }
 
 //确认提交所有暂存的问题
-export function postAllTempQuestion(UserName){
+export function postAllTempQuestion(data){
     return request({
-        url:`/problem/get/${UserName}`,
-        method:'get'
+        url:`/problem/getStatus1/${data.userName}`,
+        method:'post',
+        data:data.idArr
     })
 }
+
+//

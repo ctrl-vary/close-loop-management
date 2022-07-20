@@ -71,7 +71,7 @@
   </el-form>
   <span slot="footer" class="dialog-footer">
     <el-button @click="questionFormDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="btnQuestionFormAdd">确 定</el-button>
+    <el-button type="primary" @click="btnQuestionFormAdd">提交暂存</el-button>
   </span>
 </el-dialog>
 
@@ -86,7 +86,8 @@ import {
 import Cookies from "js-cookie";
 import getStrName from '@/utils/dataConversion/index.js'
 import {parseTime} from '@/utils/ruoyi'
-import {addNewProblem} from '@/api/entrymanage/index'
+import {addNewProblem,getAllTempQuestion} from '@/api/entrymanage/index'
+
 export default {
   data() {
     return {
@@ -183,25 +184,15 @@ export default {
           addForm[item.strName] = item.fillVal
         }
       })
-      let ss = {
-        according: "西南油田手册",
-        category: "生产运行",
-        cause: "原因2",
-        checkName: "6546",
-        keyWord: "6546",
-        level: "级别3",
-        planEndTime: "2022-07-13",
-        quesDept: "成都总站",
-        quesDesc: "54",
-        seriousLevel: "严重",
-        userName: "SCadmin",
-
-      }
-      
-      addNewProblem(ss).then(msg=>{
-        console.log(msg)
+      addNewProblem(addForm).then(msg=>{
+        this.$message({
+          type:"success",
+          message:"录入成功"
+        })
+        this.resetTable()
+        this.questionFormDialogVisible= false
       },err=>{
-        console.log(err+"错误了")
+        console.log(err)
       })
     }
 

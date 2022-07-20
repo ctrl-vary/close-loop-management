@@ -1,10 +1,10 @@
 <template>
-  <div> 问题审核</div>
+  <div> 问题</div>
 </template>
 
 <script>
 export default {
-
+    
 }
 </script>
 
