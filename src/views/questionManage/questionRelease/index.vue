@@ -2,17 +2,17 @@
   <div class="app-container"> 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-download" size="mini"
+        <el-button type="primary" plain icon="el-icon-bottom" size="mini" disabled
           >批量下发</el-button>
       </el-col>
     </el-row>
     
 
-   <result-table :tableData="tableData">
+   <result-table :tableData="tableData"  v-loading="loading">
      <template slot="tools">
        <el-table-column label="操作">
            <template slot-scope="scope">
-             <el-button type="text" icon="el-icon-download" size="mini" @click="btnReleaseQues(scope.row.quesId)" >下发</el-button>
+             <el-button type="text" icon="el-icon-bottom" size="mini" @click="btnReleaseQues(scope.row.quesId)" >下发</el-button>
            </template>
        </el-table-column>
       </template>
@@ -26,7 +26,7 @@
 
 <script>
 import resultTable from '@/views/components/resultTable'
-import Cookies from "js-cookie";
+import storageSession from '@/utils/storage'
 import { parseTime } from '@/utils/ruoyi'
 import {getDeptQuestion,getDeptInIssue,postQuse} from '@/api/questionmanage/index'
 export default {
@@ -35,6 +35,7 @@ export default {
   },
     data(){
       return{
+        loading:false,
         tableData:[]
       }
     },
@@ -44,8 +45,9 @@ export default {
     methods:{
         //获取待下发的问题
        async getDeptInIssueList(){
-        console.log(Cookies.get('username'))
-        const res = await getDeptInIssue(Cookies.get('username'))
+        this.loading =true
+        console.log(storageSession.getItem('username'))
+        const res = await getDeptInIssue(storageSession.getItem('username'))
         console.log(res)
           this.tableData = res.rows.map(item=>{
              return {
@@ -54,7 +56,9 @@ export default {
           planEndTimeF: parseTime(item.planEndTime, "{yy}-{mm}-{dd}"),
           createTimeF: parseTime(item.createTime, "{yy}-{mm}-{dd}"),
         }
+        
           })
+          this.loading =false
        },
        //获取id
      async  btnReleaseQues(quesId){
@@ -76,7 +80,7 @@ export default {
           type:"info",
           message:"取消下发!"
          })
-      })
+      }).finally(()=>this.getDeptInIssueList())
        }
     }
 }

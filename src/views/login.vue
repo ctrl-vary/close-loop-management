@@ -64,8 +64,9 @@
 <script>
 import { getCodeImg } from "@/api/login";
 import Cookies from "js-cookie";
+import { getUserProfile } from "@/api/system/user";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
-
+import storageSession from '@/utils/storage'
 export default {
   name: "Login",
   data() {
@@ -140,8 +141,17 @@ export default {
             Cookies.remove("password");
             Cookies.remove('rememberMe');
           }
+
           this.$store.dispatch("Login", this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+
+          
+            //设置
+            getUserProfile().then(res=>{
+              console.log(res)
+             storageSession.setItem("username",res.data.userName)
+            })
+           
           }).catch(() => {
             this.loading = false;
             if (this.captchaOnOff) {

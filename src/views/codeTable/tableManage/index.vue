@@ -49,9 +49,9 @@
 <el-dialog
   :title="'当前字典类型:'+addNewCodeItemForm.dictionaryTypeName"
   :visible.sync="addCodeTableDialogVisible"
-  width="30%"
+  width="40%"
  >
-  <el-form>
+  <el-form label-width="100px">
     <el-form-item label="新增字典项:"> <el-input v-model="addNewCodeItemForm.dictionaryItemValue"></el-input> </el-form-item>
   </el-form>
   <span slot="footer" class="dialog-footer">

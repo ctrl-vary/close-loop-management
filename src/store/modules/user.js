@@ -1,6 +1,6 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
-
+import storageSession from '@/utils/storage'
 const user = {
   state: {
     token: getToken(),
@@ -75,6 +75,7 @@ const user = {
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
           removeToken()
+          storageSession.clear()
           resolve()
         }).catch(error => {
           reject(error)
@@ -88,6 +89,7 @@ const user = {
         commit('SET_TOKEN', '')
         removeToken()
         resolve()
+        storageSession.clear()
       })
     }
   }

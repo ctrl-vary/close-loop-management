@@ -1,8 +1,8 @@
 <template>
   <div>
-       <el-table  :data="tableData"  @selection-change="handleSelectionChange">
+       <el-table  :data="tableData"  @selection-change="handleSelectionChange"  >
        <slot name="allSelect"></slot>
-       <el-table-column type="expand"  >
+       <el-table-column type="expand" width="30" >
         <template slot-scope="scope">
            <el-form inline class="demo-table-expand" label-position="left">
                  <el-form-item label="问题关键词:"> {{scope.row.keyWord}} </el-form-item>
@@ -11,16 +11,16 @@
                   <el-form-item label="整改完成期限:"> {{scope.row.planEndTimeF}} </el-form-item>
            </el-form>
         </template>
-       </el-table-column>
-         <el-table-column label="问题录入时间" prop="startTimeF" >
+       </el-table-column >
+         <el-table-column label="问题录入时间" prop="startTimeF" align="center">
          </el-table-column>
-          <el-table-column label="问题名称" prop="checkName" >
+          <el-table-column label="问题名称" prop="checkName" align="center" >
          </el-table-column>
-          <el-table-column label="问题级别" prop="level" >
+          <el-table-column label="问题级别" prop="level" align="center" >
          </el-table-column>
-           <el-table-column label="问题种类" prop="category" >
+           <el-table-column label="问题种类" prop="category" align="center">
          </el-table-column>
-           <el-table-column label="问题责任部门" prop="quesDept" />
+           <el-table-column label="问题责任部门" prop="quesDept" align="center" />
         <slot name="tools"></slot>
     </el-table>
  

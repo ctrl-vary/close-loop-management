@@ -26,4 +26,11 @@ export function postAllTempQuestion(data){
     })
 }
 
-//
+//删除暂存问题
+export function deleteTempQuestion(quesId){
+    
+    return request({
+        url:`/problem/del/${quesId}`,
+        method:'delete',
+    })
+}

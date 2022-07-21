@@ -66,7 +66,10 @@ export function postChangeEvidence(data){
   return request({
     url: `/reform/update`,
     method: 'post',
-    data:data
+    data:data,
+    headers:{
+      'Content-Type':'multipart/form-data'
+    }
   })
 }
 //提交整改信息
@@ -74,5 +77,20 @@ export function getUploadEvidence(quesId){
   return request({
     url: `/reform/Becheck/${quesId}`,
     method: 'get'
+  })
+}
+
+//获取本部门待闭环问题
+export function getDeptCloseQues(userName){
+  return request({
+    url:`/problem/ToClose/${userName}`,
+    method:"get"
+  })
+}
+//获取流程信息
+export function getProcessInfo(quesId){
+  return request({
+    url:`/transfer/list/${quesId}`,
+    method:"get"
   })
 }

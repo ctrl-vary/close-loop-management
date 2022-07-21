@@ -14,16 +14,16 @@
       </el-col>
 
     </el-row>
-    <temp-question :tableData="quesTempTableData" @selectionChange="handleSelectionChange">
+    <temp-question :tableData="quesTempTableData" @selectionChange="handleSelectionChange" v-loading="loading">
       <template slot="allSelect">
         <el-table-column type="selection"></el-table-column>
       </template>
       <template slot="tools">
-        <el-table-column label="操作">
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="text" icon="el-icon-edit" size="mini" @click="btnDelete(scope.row)">修改</el-button>
-            <el-button type="text" icon="el-icon-edit" size="mini">删除</el-button>
-            <el-button type="text" icon="el-icon-edit" size="mini" @click="btnSinglePost(scope.row)">下发</el-button>
+            <el-button type="text" icon="el-icon-edit" size="mini" >修改</el-button>
+            <el-button type="text" icon="el-icon-delete" size="mini" @click="btnDelete(scope.row.quesId)">删除</el-button>
+            <el-button type="text" icon="el-icon-bottom" size="mini" @click="btnSinglePost(scope.row)">下发</el-button>
           </template>
         </el-table-column>
       </template>
@@ -34,16 +34,18 @@
 </template>
 
 <script>
-import { postAllTempQuestion, getAllTempQuestion } from '@/api/entrymanage/index'
-import Cookies from "js-cookie";
+import { postAllTempQuestion, getAllTempQuestion ,deleteTempQuestion} from '@/api/entrymanage/index'
+// import Cookies from "js-cookie";
 import { parseTime } from '@/utils/ruoyi'
 import resultTable from '@/views/components/resultTable'
+import storageSession from '@/utils/storage'
 export default {
   components: {
     "temp-question": resultTable
   },
   data() {
     return {
+
       quesList: [],
       loading: false,
       quesTempTableData: [],
@@ -53,13 +55,10 @@ export default {
   created() {
     this.getAlltempQuesList()
   },
-  activated() {
-    this.getAlltempQuesList()
-  },
   methods: {
     async getAlltempQuesList() {
-
-      const res = await getAllTempQuestion(Cookies.get('username'))
+       this.loading =true
+      const res = await getAllTempQuestion(storageSession.getItem('username'))
       console.log(res.data)
       this.quesTempTableData = res.data.map(item => {
         return {
@@ -69,6 +68,7 @@ export default {
           createTimeF: parseTime(item.createTime, "{yy}-{mm}-{dd}"),
         }
       })
+      this.loading = false
     },
     handleSelectionChange(valArr) {
       this.selectArr = valArr
@@ -76,7 +76,7 @@ export default {
     //批量下发
     btnBatchPost() {
       let postData = {
-        userName: Cookies.get('username'),
+        userName: storageSession.getItem('username'),
         idArr: []
       }
       this.selectArr.forEach(item => {
@@ -100,11 +100,12 @@ export default {
           type:"info",
           message:"取消下发!"
          })
-      })
+      }).finally(()=>this.getAlltempQuesList())
     },
+    //单个下发
     btnSinglePost(info){
        let postData = {
-        userName: Cookies.get('username'),
+        userName: storageSession.getItem('username'),
         idArr: []
       }
       postData.idArr.push(info.quesId)
@@ -125,7 +126,29 @@ export default {
           type:"info",
           message:"取消下发!"
          })
-      })
+      }).finally(()=> this.getAlltempQuesList())
+    },
+    //删除根据id
+    btnDelete(quesId){
+        this.$confirm('确定要删除这条问题记录吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const res = await deleteTempQuestion(quesId)
+        console.log(res)
+
+        this.$message({
+          type:"success",
+          message:"删除成功"
+        })
+      }).catch(err => {
+         this.$message({
+          type:"info",
+          message:"取消删除!"
+         })
+      }).finally(()=> this.getAlltempQuesList())
+
     }
   }
 }

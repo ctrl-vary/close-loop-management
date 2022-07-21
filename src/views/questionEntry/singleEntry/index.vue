@@ -49,7 +49,7 @@
         </el-table-column>
       </el-table>
     </el-row>
-    <el-row class="all-margin-top-15 all-center" > <el-button size="mini" @click="questionFormDialogVisible=true"  type="primary">开始录入</el-button> </el-row>
+    <el-row class="all-margin-top-15 all-center" > <el-button size="mini" @click="btnIsFillAll"  type="primary">开始录入</el-button> </el-row>
      
  <el-dialog
    title="问题预览"
@@ -70,8 +70,8 @@
     </el-form-item>
   </el-form>
   <span slot="footer" class="dialog-footer">
-    <el-button @click="questionFormDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="btnQuestionFormAdd">提交暂存</el-button>
+    <el-button size="mini" @click="questionFormDialogVisible = false">取 消</el-button>
+    <el-button size="mini" type="primary" @click="btnQuestionFormAdd">提交暂存</el-button>
   </span>
 </el-dialog>
 
@@ -83,7 +83,7 @@
 import {
   getCodeTable,
 } from "@/api/tablemanage/getCodeTableInfo";
-import Cookies from "js-cookie";
+import storageSession from '@/utils/storage'
 import getStrName from '@/utils/dataConversion/index.js'
 import {parseTime} from '@/utils/ruoyi'
 import {addNewProblem,getAllTempQuestion} from '@/api/entrymanage/index'
@@ -142,7 +142,7 @@ export default {
         // console.log(Cookies.get('username'))
         this.loading = true;
         const res = await getCodeTable(this.queryParams);
-      
+        
          //数据处理去掉null的值 dictionaryItem.dictionaryItemValue=null的情况
         let tempArr = res.data.map(item=>{
          return {
@@ -167,23 +167,28 @@ export default {
         this.loading = false;
       }
     },
-
+   //重置码表
     resetTable(){
         this.codeTableData.forEach(item => {
           item.fillVal = ""
         });
     },
+    //问题提交
     btnQuestionFormAdd(){
       let addForm = {
-        userName:Cookies.get('username')
+        userName:storageSession.getItem('username')
       }
+     
       this.codeTableData.forEach(item=>{
         if(item.isTime){
+          
           addForm[item.strName] = parseTime(item.fillVal,"{yy}-{mm}-{dd}")
         }else{
           addForm[item.strName] = item.fillVal
         }
+      
       })
+ 
       addNewProblem(addForm).then(msg=>{
         this.$message({
           type:"success",
@@ -194,6 +199,22 @@ export default {
       },err=>{
         console.log(err)
       })
+    },
+    btnIsFillAll(){
+      let isFill = false
+      this.codeTableData.forEach(item=>{
+         if(item.fillVal==""){
+          isFill = true
+         }
+      })
+      if(isFill){
+        return this.$message({
+          type:"warning",
+          message:"您还有内容没填完整!!"
+        })
+      }
+         this.questionFormDialogVisible= true
+
     }
 
   },
