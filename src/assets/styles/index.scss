@@ -5,6 +5,9 @@
 @import './sidebar.scss';
 @import './btn.scss';
 
+
+$tableColor: #FAFAFA;
+$tableColor2: #F5F7FA;
 body {
   height: 100%;
   -moz-osx-font-smoothing: grayscale;
@@ -195,10 +198,21 @@ aside {
   margin-top: 15px;
 }
 .all-margin-left-15{
-  margin-top: 15px;
+  margin-left: 15px;
+}
+.all-margin-bottom-15{
+  margin-bottom: 15px;
 }
 
 .all-center{
    display: flex;
    justify-content: center;
+}
+
+.table-odd-class {
+  background: $tableColor !important;
+}
+
+.table-even-class {
+  background: $tableColor2 !important;
 }

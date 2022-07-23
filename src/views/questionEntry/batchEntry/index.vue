@@ -1,48 +1,6 @@
 <template>
-  <div class="app-container">
-     <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button
-              type="success"
-              plain
-              icon="el-icon-edit"
-              size="mini"
-             
-            >修改</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="danger"
-              plain
-              icon="el-icon-delete"
-              size="mini"
-           
-            >删除</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="info"
-              plain
-              icon="el-icon-upload2"
-              size="mini"
-              @click="btnOpenUploadDialog"
-            >批量导入</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="success"
-              plain
-              icon="el-icon-download"
-              size="mini"
-            >模板下载</el-button>
-          </el-col>
-        </el-row>
-    批量问题录入
-     <el-dialog
-  title="Excel上传"
-  :visible.sync="upLoadDialogVisible"
-  width="30%"
- >
+  <div >
+
  <!-- 文件上传 -->
    <el-upload
   class="upload-demo"
@@ -60,22 +18,35 @@
   <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
   <div slot="tip" class="el-upload__tip">只能上传.xlxs/.xls文件，且不超过500kb</div>
 </el-upload>
-  <span slot="footer" class="dialog-footer">
-    <el-button @click="upLoadDialogVisible = false">取 消</el-button>
+<el-row class="all-center all-margin-top-15">
+    <el-button @click="btnCancelTheDialog">取 消</el-button>
     <el-button type="primary" @click="btnConfirmUpload">确 定</el-button>
-  </span>
-</el-dialog>
+  </el-row>
+   
+
   </div>
 </template>
 
 <script>
 import xlsx from 'xlsx';
+import getStrName from '@/utils/dataConversion/index.js'
+  import resultTable from '@/views/components/resultTable'
 export default {
+ props:{
+     fatherDialogVisible:{
+      type:Boolean
+     },
+     postExcelTable:{
+      type:Array
+     }
+ },
    data(){
     return{
       //上传对话框
        upLoadDialogVisible:false,
-       fileList:[]
+       fileList:[],
+
+       excelTableData:[]
     }
    },
    created(){
@@ -89,7 +60,15 @@ export default {
     },
     //确认上传
     btnConfirmUpload(){
-        alert("上传成功")
+     
+      if(this.excelTableData.length==0){
+      return  this.$message({
+          type:"warning",
+          message:"还没传Excel呢"
+        })
+      }
+      this.$emit("update:postExcelTable",this.excelTableData)
+      this.$emit("update:fatherDialogVisible",false)
     },
     //上传
     changeUploadHandle(file,filelist){
@@ -113,6 +92,7 @@ export default {
        })
     },
     handleRemove(file, fileList){
+      this.excelTableData = []
          this.$message({
           type:"warning",
           message:"移除成功！"
@@ -142,9 +122,23 @@ export default {
         //获取指定的表格
         let worksheet = workbook.Sheets[workbook.SheetNames[0]]
         //调用提供的Api转化为Josn数据
-        let jsonData = xlsx.utils.sheet_to_json(worksheet)
-        console.log(jsonData)
+        let jsonDataArr = xlsx.utils.sheet_to_json(worksheet)
+        console.log(jsonDataArr)
+        let shiftArr = []
+        jsonDataArr.forEach(item=>{
+            let tempArr = {}
+            Object.keys(item).forEach(key=>{
+              tempArr[getStrName(key)]=item[key] 
+            })
+            shiftArr.push(tempArr)
+        })
+        
+        this.excelTableData = shiftArr
       })
+    },
+    //取消父组件的对话框
+    btnCancelTheDialog(){
+      this.$emit("update:fatherDialogVisible",false)
     }
 
    }

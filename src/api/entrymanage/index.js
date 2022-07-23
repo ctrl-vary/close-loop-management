@@ -34,3 +34,11 @@ export function deleteTempQuestion(quesId){
         method:'delete',
     })
 }
+//更新暂存信息
+export function postChangeTempQuestion(data){
+    return request({
+        url:`/problem/update`,
+        method:'post',
+        data:data
+    })
+}

@@ -11,7 +11,7 @@
       </template>
     </result-table>
 
-      <el-dialog
+   <el-dialog
   title="证据查看"
   :visible.sync="checkEvidenceVisible"
   width="30%"
@@ -50,8 +50,7 @@ export default {
         description: "",
         picurl: []
       },
-      fileList: [],
-      tempPicList: []
+     
     }
   },
   created() {
