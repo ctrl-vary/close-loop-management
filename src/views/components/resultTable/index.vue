@@ -9,7 +9,7 @@
                  <el-form-item label="问题关键词:"> {{scope.row.keyWord}} </el-form-item>
                  <el-form-item label="问题描述:"> {{scope.row.quesDesc}} </el-form-item>
                  <el-form-item label="问题产生原因:"> {{scope.row.cause}} </el-form-item>
-                  <el-form-item label="预计整改完成时间:"> {{scope.row.planEndTimeF}} </el-form-item>
+                  <el-form-item label="预计整改完成时间:"> {{scope.row.planEndTimeF||scope.row.planEndTime}} </el-form-item>
                     <el-form-item label="判定依据:"> {{scope.row.according}} </el-form-item>
                   
            </el-form>

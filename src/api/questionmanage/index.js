@@ -16,7 +16,7 @@ export function getDeptInCheck(userName){
         method: 'get'
       })
 }
-//获取本部门所有待下发问题
+//获取本部门所有待处理或者继续 下发问题 
 export function getDeptInIssue(userName){
     return request({
         url: `/problem/Inissue/${userName}`,
@@ -24,12 +24,12 @@ export function getDeptInIssue(userName){
       })
 }
 //获取本部门所有待整改问题
-export function getDeptQuestion(userName){
-    return request({
-        url: `/problem/Inreform/${userName}`,
-        method: 'get'
-      })
-}
+// export function getDeptQuestion(userName){
+//     return request({
+//         url: `/problem/Inreform/${userName}`,
+//         method: 'get'
+//       })
+// }
 
 //打回问题
 export function getRepulse(quesId){
@@ -40,9 +40,9 @@ export function getRepulse(quesId){
 }
 
 //下发问题
-export function postQuse(quesId){
+export function postQuse(data){
     return request({
-        url: `/problem/issue/${quesId}`,
+        url: `/problem/issue/${data.quesId}/${data.deptName}`,
         method: 'post'
       })
 }

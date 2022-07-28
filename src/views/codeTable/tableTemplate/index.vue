@@ -11,12 +11,12 @@
        <template slot-scope="scope">
         
         <el-checkbox-group  v-model="scope.row.selectCodeTable" >
+                
                 <div  v-for="(dictitem,index) in scope.row.dictionaryItem" :key="index">
-                           <el-checkbox v-if="dictitem.dictionaryItemValue" style="display:block;" :label="dictitem.dictionaryItemValue"  >{{dictitem.dictionaryItemValue}}</el-checkbox>
+                <!-- 0是启用 -->
+                           <el-checkbox v-if="dictitem.dictionaryItemValue&&dictitem.status==0" style="display:block;" :label="dictitem.dictionaryItemValue"  >{{dictitem.dictionaryItemValue}}</el-checkbox>
                 </div>
          </el-checkbox-group>
-        
-            
        </template>
     </el-table-column>
     </el-table>
@@ -60,9 +60,10 @@ export default {
         this.loading = true
         try {
              const res = await getCodeTable()
+             console.log(res)
         this.codeTableData = res.data.map((item)=>{
             return{
-                selectCodeTable:[],
+                selectCodeTable:this.choseAllFirst(item.dictionaryItem),
                 ...item
             }
         })
@@ -72,6 +73,12 @@ export default {
          this.loading = false
         }
        
+    },
+    //筛选status为0的
+    choseAllFirst(itemArr){
+      let res = []
+      res = itemArr.filter(item=>item.status===0).map(item=>item.dictionaryItemValue)
+      return res
     },
      //导出信息
    async handleExport(){
@@ -84,7 +91,6 @@ export default {
                 selectCodeTable:[...item.selectCodeTable]
             })
         })
-   
   
    const res =   await excelCodeTable({
         sheetName:"表格",

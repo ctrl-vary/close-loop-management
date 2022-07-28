@@ -42,3 +42,16 @@ export function postChangeTempQuestion(data){
         data:data
     })
 }
+//当前录入的已闭环
+export function getMyHadCloseQues(userName){
+ return request({
+    url:`/problem/ByUser/${userName}`
+ })
+}
+
+//当前录入的未闭环问题
+export function getMyNoCloseQues(userName){
+    return request({
+       url:`/problem/ByUserClosed/${userName}`
+    })
+   }

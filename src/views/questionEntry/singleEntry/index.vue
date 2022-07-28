@@ -1,10 +1,5 @@
 <template>
   <div class="app-container">
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="resetTable">重置表单</el-button>
-      </el-col>
-    </el-row>
     <el-row>
       <el-table v-loading="loading" :data="codeTableData">
         <el-table-column label="问题字典" min-width="100" align="center">
@@ -37,6 +32,7 @@
     <el-row class="all-margin-top-15 all-center">
       <el-button @click="btnCancelDialog" size="mini">取消</el-button>
       <el-button size="mini" @click="btnIsFillAll" type="primary">开始录入</el-button>
+       <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="resetTable">重置表单</el-button>
     </el-row>
 
 

@@ -16,10 +16,10 @@ export function addCodeTable(data){
     })
 }
 
-export function deleteCodeTable(data){
+export function deleteCodeTableById(id){
     return request({
-        url: `/codetable/delitemvalue?dictionaryTypeName=${data.dictionaryTypeName}&dictionaryItemValue=${data.dictionaryItemValue}`,
-        method: 'delete',
+        url: `/codetable/delitemvalue/${id}`,
+        method: 'get',
     })
 }
 
@@ -29,5 +29,13 @@ export function excelCodeTable(excelData){
         method: 'post',
         data: JSON.stringify(excelData) ,
         responseType: 'blob'  //后端传的数据流，必须加这个
+    })
+}
+//更改码表是否启用
+export function changeCodeTableState(data){
+    console.log(data)
+    return request({
+        url:`/codetable/update/${data.status}/${data.id}`,
+        method:'get'
     })
 }
