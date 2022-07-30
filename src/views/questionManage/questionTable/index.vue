@@ -3,18 +3,19 @@
   <div class="app-container">
     <el-form ref="queryForm" size="small" :inline="true" label-width="68px">
       <el-form-item label="检查名称" prop="userName">
-        <el-input placeholder="请输入检查名称" clearable style="width: 240px" />
+        <el-input placeholder="请输入检查名称" clearable v-model="queryParams.checkName" style="width: 240px" />
       </el-form-item>
       <el-form-item label="问题关键词" prop="phonenumber" label-width="100px">
-        <el-input placeholder="请输入问题关键词" clearable style="width: 240px" />
+        <el-input placeholder="请输入问题关键词" clearable v-model="queryParams.keyWord" style="width: 240px" />
       </el-form-item>
       <el-form-item label="创建时间">
-        <el-date-picker style="width: 240px" value-format="yyyy-MM-dd" type="daterange" range-separator="-"
-          start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+        <el-date-picker style="width: 240px" value-format="yyyy-MM-dd" type="daterange" v-model="timerValArr"
+          range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期" :picker-options="pickerOptions">
+        </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini">重置</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="btnSearch">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="btnResetSearch">重置</el-button>
       </el-form-item>
     </el-form>
     <el-row :gutter="14" class="mb8">
@@ -42,12 +43,13 @@
         <el-button plain type="text" size="mini"> {{ tableTitle }} </el-button>
       </el-col>
     </el-row>
+    <!-- 问题表格 -->
     <result-table :tableData="tableData" v-loading="loading">
       <template slot="tools">
         <el-table-column label="操作" min-width="140" align="center">
           <template slot-scope="scope">
             <div v-if="hanleTableCol == 'close'">
-              <el-button size="mini" type="text" icon="el-icon-check" @click="btnCheckProcess(scope.row.quesId)">流程查看
+              <el-button size="mini" type="text" icon="el-icon-check" @click="btnCheckProcess(scope.row.quesId)">流程追踪
               </el-button>
             </div>
             <div v-else-if="hanleTableCol == 'handle'">
@@ -68,6 +70,9 @@
         </el-table-column>
       </template>
     </result-table>
+      <!-- 分页 -->
+    <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
+      @pagination="pageChangeEvent" />
     <!-- 证据更改 -->
     <el-dialog title="证据上传" :visible.sync="upLoadDialogVisible" width="35%">
       <el-form label-width="80px">
@@ -167,6 +172,34 @@ export default {
   },
   data() {
     return {
+       //时间学着帮助器
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
       loading: false,
       //名字
       allTableTitle: {
@@ -215,12 +248,27 @@ export default {
       deptOptions: [],
       //部门树的信息
       selectDeptName:undefined,
-      TempQuesId:""
+      TempQuesId:"",
+       total: 2,
+      queryParams: {
+        pageSize: 10,
+        pageNum: 1,
+        userId: "",
+        keyWord: "",
+        checkName: "",
+        beginTime: "",
+        endTime: ""
+      },
+      //时间选择
+      timerValArr: [],
+      userId:""
 
 
     }
   },
   created() {
+    this.userId = storageSession.getItem('userId')
+    this.queryParams.userId = this.userId
      this.getTreeselect()
     this.getCloseQuesList(false)
     this.getDeptPostIssueList(true)
@@ -275,13 +323,15 @@ export default {
        this.keepPostVisible = false
     }
     },
-    //待闭环问题列表
+    //经手闭环问题列表
     async getCloseQuesList(booleanVal) {
       let res
       if (booleanVal) {
         //如果要加载列表
         this.loading = true
-        res = await getDeptCloseQues(storageSession.getItem('username'))
+        res = await getDeptCloseQues(this.queryParams)
+        this.total = res.total
+        console.log(res)
         this.tableData = res.rows.map(item => {
           return {
             ...item,
@@ -292,9 +342,9 @@ export default {
         })
       } else {
         //如果不加载列表
-        res = await getDeptCloseQues(storageSession.getItem('username'))
+        res = await getDeptCloseQues(this.queryParams)
       }
-      this.closeQuesNum = res.rows.length
+      this.closeQuesNum = res.total
       this.loading = false
     },
     //待处理问题列表
@@ -303,8 +353,9 @@ export default {
       let res
       if (bolleanVal) {
         this.loading = true
-        console.log(storageSession.getItem('username'))
-        res = await getDeptInIssue(storageSession.getItem('username'))
+        res = await getDeptInIssue(this.queryParams)
+        this.total = res.total
+        console.log(res)
         this.tableData = res.rows.map(item => {
           return {
             ...item,
@@ -314,14 +365,14 @@ export default {
           }
         })
       } else {
-        res = await getDeptInIssue(storageSession.getItem('username'))
+        res = await getDeptInIssue(this.queryParams)
       }
-      this.hanleQuesNum = res.rows.length
+      this.hanleQuesNum = res.total
       this.loading = false
     },
     //继续下发对话框的操作
     async btnReleaseQues(quesId) {
-      console.log("进来的")
+      //保存一些信息和处理一些字段
       this.TempQuesId = quesId
       this.selectDeptName = undefined
       this.keepPostVisible = true
@@ -333,8 +384,8 @@ export default {
       if (bolleanVal) {
         this.loading = true
         console.log(storageSession.getItem('username'))
-        res = await getDeptInCheck(storageSession.getItem('username'))
-        console.log(res.rows)
+        res = await getDeptInCheck(this.queryParams)
+         this.total = res.total
         this.tableData = res.rows.map(item => {
           return {
             ...item,
@@ -344,10 +395,10 @@ export default {
           }
         })
       } else {
-        res = await getDeptInCheck(storageSession.getItem('username'))
+        res = await getDeptInCheck(this.queryParams)
 
       }
-      this.checkQuesNum = res.rows.length
+      this.checkQuesNum = res.total
       this.loading = false
     },
     //审核证据查看
@@ -552,6 +603,7 @@ export default {
     },
     //改变table
     btnChangeTable(tableName) {
+      this.resetQueryParams()
       if (tableName === "handle") {
         this.hanleTableCol = "handle"
         this.tableTitle = this.allTableTitle.hanleTitle
@@ -578,6 +630,58 @@ export default {
         }
       })
       this.processVisible = true
+    },
+       //分页跟着table的不同调用不用的接口
+    pageChangeEvent() {
+      if (this.hanleTableCol == "handle") {
+       this.getDeptPostIssueList(true)
+      } else if (this.hanleTableCol == "close") {
+        this.getCloseQuesList(true)
+      } else {
+        this.getDeptInCheckList(true)
+      }
+    },
+       //重置
+    resetQueryParams() {
+       this.timerValArr = []
+      Object.keys(this.queryParams).forEach(key => {
+        this.queryParams[key] = ""
+      })
+      //这些先初始化
+      this.queryParams.pageSize = 10
+      this.queryParams.pageNum = 1
+      this.queryParams.userId = this.userId
+    },
+    //搜索操作
+    btnSearch() {
+      this.queryParams.beginTime = this.timerValArr[0]
+      this.queryParams.endTime = this.timerValArr[1]
+      switch (this.hanleTableCol) {
+        case "handle":
+         this.getDeptPostIssueList(true)
+          break;
+       case "close":
+            this.getCloseQuesList(true)
+          break;
+        default:
+         this.getDeptInCheckList(true)
+          break;
+      }
+    },
+    //重置加搜索
+    btnResetSearch(){
+      this.resetQueryParams()
+       switch (this.hanleTableCol) {
+        case "handle":
+         this.getDeptPostIssueList(true)
+          break;
+       case "close":
+            this.getCloseQuesList(true)
+          break;
+        default:
+         this.getDeptInCheckList(true)
+          break;
+      }
     }
 
   }

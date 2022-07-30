@@ -10,10 +10,11 @@ export function addNewProblem(data){
     })
 }
 //查询本人所有暂存问题
-export function getAllTempQuestion(UserName){
+export function getAllTempQuestion(queryParams){
     return request({
-        url:`/problem/get/${UserName}`,
-        method:'get'
+        url:`/problem/get`,
+        method:'get',
+        params: queryParams
     })
 }
 
@@ -43,15 +44,27 @@ export function postChangeTempQuestion(data){
     })
 }
 //当前录入的未闭环问题
-export function getMyNoCloseQues(userName){
+export function getMyNoCloseQues(queryParams){
  return request({
-    url:`/problem/ByUser/${userName}`
+    url:`/problem/ByUser`,
+    method:'get',
+    params: queryParams
  })
 }
 
 //当前录入的已闭环问题
-export function getMyHadCloseQues(userName){
+export function getMyHadCloseQues(queryParams){
     return request({
-       url:`/problem/ByUserClosed/${userName}`
+       url:`/problem/ByUserClosed`,
+       method:'get',
+       params: queryParams
     })
-   }
+}
+//批量导入问题
+export function postExcelQuesData(data){
+    return request({
+        url:`/problem/addlist/${data.userName}`,
+        method:'post',
+        data:data.quesArr
+    })
+}

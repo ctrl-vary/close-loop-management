@@ -10,26 +10,21 @@ export const getRouters = () => {
 
 
 //获取本部门所有待验收问题
-export function getDeptInCheck(userName){
+export function getDeptInCheck(queryParams){
     return request({
-        url: `/problem/Incheck/${userName}`,
-        method: 'get'
+        url: `/problem/Incheck`,
+        method: 'get',
+        params: queryParams
       })
 }
 //获取本部门所有待处理或者继续 下发问题 
-export function getDeptInIssue(userName){
+export function getDeptInIssue(queryParams){
     return request({
-        url: `/problem/Inissue/${userName}`,
-        method: 'get'
+        url: `/problem/Inissue`,
+        method: 'get',
+        params: queryParams
       })
 }
-//获取本部门所有待整改问题
-// export function getDeptQuestion(userName){
-//     return request({
-//         url: `/problem/Inreform/${userName}`,
-//         method: 'get'
-//       })
-// }
 
 //打回问题
 export function getRepulse(quesId){
@@ -81,10 +76,11 @@ export function getUploadEvidence(quesId){
 }
 
 //获取本部门待闭环问题
-export function getDeptCloseQues(userName){
+export function getDeptCloseQues(queryParams){
   return request({
-    url:`/problem/ToClose/${userName}`,
-    method:"get"
+    url:`/problem/ToClose`,
+    method:"get",
+    params: queryParams
   })
 }
 //获取流程信息

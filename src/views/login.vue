@@ -148,8 +148,8 @@ export default {
           
             //设置
             getUserProfile().then(res=>{
-              console.log(res)
              storageSession.setItem("username",res.data.userName)
+               storageSession.setItem("userId",res.data.userId)
             })
            
           }).catch(() => {
