@@ -117,6 +117,21 @@ export default {
         dictionaryTypeName: this.addNewCodeItemForm.dictionaryTypeName,
         dictionaryItemValue: this.addNewCodeItemForm.dictionaryItemValue
       })
+      console.log(res)
+      if(res.msg=='success'){
+          this.$message({
+        type:"success",
+        message:res.msg
+
+      })
+      }else{
+            this.$message({
+        type:"warning",
+        message:res.msg
+
+      })
+      }
+      
       this.addNewCodeItemForm.dictionaryItemValue = ""
       this.getCodeList()
       this.addCodeTableDialogVisible = false

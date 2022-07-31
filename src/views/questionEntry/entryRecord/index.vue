@@ -279,6 +279,7 @@ export default {
       //当前操作列名称
       nowColName: 'ques',
       //获取当前登录名字
+      userName:"",
       userId: "",
       allTableTitle: {
         quesName: "所有暂存问题",
@@ -307,6 +308,7 @@ export default {
     }
   },
   created() {
+    this.userName = storageSession.getItem('username')
     this.userId = storageSession.getItem('userId')
     this.queryParams.userId = this.userId
     this.getAlltempQuesList()
@@ -494,7 +496,7 @@ export default {
         this.getAlltempQuesList()
       } else if (strName == 'hadclose') {
         this.tableTitle = this.allTableTitle.hadClose
-        this.nowColName = 'colse'
+        this.nowColName = 'hadclose'
         this.getAllhadCloseList(true)
       } else {
         this.tableTitle = this.allTableTitle.noClose
@@ -556,11 +558,15 @@ export default {
     btnSearch() {
       this.queryParams.beginTime = this.timerValArr[0]
       this.queryParams.endTime = this.timerValArr[1]
+     console.log(this.nowColName)
+      console.log(this.queryParams)
       switch (this.nowColName) {
         case "ques":
           this.getAlltempQuesList()
           break;
+          
        case "hadclose":
+        console.log("hadclose")
             this.getAllhadCloseList(true)
           break;
         default:

@@ -149,7 +149,7 @@ export default {
             //设置
             getUserProfile().then(res=>{
              storageSession.setItem("username",res.data.userName)
-               storageSession.setItem("userId",res.data.userId)
+             storageSession.setItem("userId",res.data.userId)
             })
            
           }).catch(() => {

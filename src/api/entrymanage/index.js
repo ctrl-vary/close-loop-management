@@ -62,6 +62,7 @@ export function getMyHadCloseQues(queryParams){
 }
 //批量导入问题
 export function postExcelQuesData(data){
+    console.log(data)
     return request({
         url:`/problem/addlist/${data.userName}`,
         method:'post',
