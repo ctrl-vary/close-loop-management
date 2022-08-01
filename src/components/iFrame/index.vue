@@ -13,14 +13,14 @@ export default {
   props: {
     src: {
       type: String,
-      required: true
+      required: true,
     },
   },
   data() {
     return {
       height: document.documentElement.clientHeight - 94.5 + "px;",
       loading: true,
-      url: this.src
+      url: this.src,
     };
   },
   mounted: function () {
@@ -31,6 +31,6 @@ export default {
     window.onresize = function temp() {
       that.height = document.documentElement.clientHeight - 94.5 + "px;";
     };
-  }
+  },
 };
 </script>

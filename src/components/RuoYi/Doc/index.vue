@@ -6,16 +6,16 @@
 
 <script>
 export default {
-  name: 'RuoYiDoc',
+  name: "RuoYiDoc",
   data() {
     return {
-      url: 'http://doc.ruoyi.vip/ruoyi-vue'
-    }
+      url: "http://doc.ruoyi.vip/ruoyi-vue",
+    };
   },
   methods: {
     goto() {
-      window.open(this.url)
-    }
-  }
-}
+      window.open(this.url);
+    },
+  },
+};
 </script>

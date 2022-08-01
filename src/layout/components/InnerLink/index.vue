@@ -4,7 +4,11 @@ export default {
     return {};
   },
   render() {
-    const { $route: { meta: { link } }, } = this;
+    const {
+      $route: {
+        meta: { link },
+      },
+    } = this;
     if ({ link }.link === "") {
       return "404";
     }

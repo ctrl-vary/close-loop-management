@@ -5,24 +5,20 @@
         <blockquote class="text-warning" style="font-size: 14px">
           首页模板
           <br />
-         
+
           <br />
-         问题数
-         
+          问题数
+
           <br />
-        问题种类
-        
-       
-         <br />
-          <h4 class="text-danger">
-            数据统计
-          </h4>
+          问题种类
+
+          <br />
+          <h4 class="text-danger">数据统计</h4>
         </blockquote>
 
         <hr />
       </el-col>
     </el-row>
-
   </div>
 </template>
 
@@ -106,4 +102,3 @@ export default {
   }
 }
 </style>
-
