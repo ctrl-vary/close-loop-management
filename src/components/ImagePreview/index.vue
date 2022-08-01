@@ -19,16 +19,16 @@ export default {
   props: {
     src: {
       type: String,
-      required: true
+      required: true,
     },
     width: {
       type: [Number, String],
-      default: ""
+      default: "",
     },
     height: {
       type: [Number, String],
-      default: ""
-    }
+      default: "",
+    },
   },
   computed: {
     realSrc() {
@@ -41,7 +41,7 @@ export default {
     realSrcList() {
       let real_src_list = this.src.split(",");
       let srcList = [];
-      real_src_list.forEach(item => {
+      real_src_list.forEach((item) => {
         if (isExternal(item)) {
           return srcList.push(item);
         }
@@ -54,7 +54,7 @@ export default {
     },
     realHeight() {
       return typeof this.height == "string" ? this.height : `${this.height}px`;
-    }
+    },
   },
 };
 </script>

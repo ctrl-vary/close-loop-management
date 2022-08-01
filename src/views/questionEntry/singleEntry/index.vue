@@ -12,13 +12,21 @@
         <el-table-column label="问题项" min-width="300" align="left">
           <template slot-scope="scope">
             <div v-if="scope.row.isTime">
-              <el-date-picker v-model="scope.row.fillVal" type="date" placeholder="选择日期">
+              <el-date-picker
+                v-model="scope.row.fillVal"
+                type="date"
+                placeholder="选择日期"
+              >
               </el-date-picker>
             </div>
             <div v-else-if="scope.row.dictionaryItem">
               <el-select v-model="scope.row.fillVal" placeholder="请选择">
-                <el-option v-for="(dictitem, index) in scope.row.dictionaryItem" :key="index"
-                  :label="dictitem.dictionaryItemValue" :value="dictitem.dictionaryItemValue">
+                <el-option
+                  v-for="(dictitem, index) in scope.row.dictionaryItem"
+                  :key="index"
+                  :label="dictitem.dictionaryItemValue"
+                  :value="dictitem.dictionaryItemValue"
+                >
                 </el-option>
               </el-select>
             </div>
@@ -31,29 +39,31 @@
     </el-row>
     <el-row class="all-margin-top-15 all-center">
       <el-button @click="btnCancelDialog" size="mini">取消</el-button>
-      <el-button size="mini" @click="btnIsFillAll" type="primary">开始录入</el-button>
-       <el-button type="primary" plain icon="el-icon-plus" size="mini" @click="resetTable">重置表单</el-button>
+      <el-button size="mini" @click="btnIsFillAll" type="primary"
+        >开始录入</el-button
+      >
+      <el-button
+        type="primary"
+        plain
+        icon="el-icon-plus"
+        size="mini"
+        @click="resetTable"
+        >重置表单</el-button
+      >
     </el-row>
-
-
-
-
   </div>
 </template>
 
 <script>
-import {
-  getCodeTable,
-} from "@/api/tablemanage/getCodeTableInfo";
-import storageSession from '@/utils/storage'
-import getStrName from '@/utils/dataConversion/index.js'
-import { parseTime } from '@/utils/ruoyi'
-import { addNewProblem, getAllTempQuestion } from '@/api/entrymanage/index'
+import { getCodeTable } from "@/api/tablemanage/getCodeTableInfo";
+import storageSession from "@/utils/storage";
+import getStrName from "@/utils/dataConversion/index.js";
+import { parseTime } from "@/utils/ruoyi";
+import { addNewProblem, getAllTempQuestion } from "@/api/entrymanage/index";
 
 export default {
   data() {
     return {
-
       //加载
       loading: true,
       //码表数据
@@ -69,22 +79,18 @@ export default {
       otherCodeTable: [
         {
           dictionaryTypeName: "检查名称",
-
         },
         {
           dictionaryTypeName: "问题关键词",
-
         },
         {
           dictionaryTypeName: "问题描述",
-
         },
         {
           dictionaryTypeName: "预计整改完成时间",
 
-          isTime: true
-
-        }
+          isTime: true,
+        },
       ],
     };
   },
@@ -104,89 +110,88 @@ export default {
         const res = await getCodeTable(this.queryParams);
 
         //数据处理去掉null的值 dictionaryItem.dictionaryItemValue=null的情况
-        let tempArr = res.data.map(item => {
+        let tempArr = res.data.map((item) => {
           return {
             dictionaryTypeName: item.dictionaryTypeName,
-            dictionaryItem: item.dictionaryItem.filter(val => !!val.dictionaryItemValue),
+            dictionaryItem: item.dictionaryItem.filter(
+              (val) => !!val.dictionaryItemValue
+            ),
+          };
+        });
 
-          }
-        })
-
-        this.codeTableData = this.otherCodeTable
-          .concat(tempArr)
-          .map((item) => {
-            return {
-              ...item,
-              strName: getStrName(item.dictionaryTypeName),
-              fillVal: "", //填入的值
-            };
-          });
+        this.codeTableData = this.otherCodeTable.concat(tempArr).map((item) => {
+          return {
+            ...item,
+            strName: getStrName(item.dictionaryTypeName),
+            fillVal: "", //填入的值
+          };
+        });
         this.loading = false;
-        console.log(this.codeTableData)
+        console.log(this.codeTableData);
       } catch (error) {
         this.loading = false;
       }
     },
     //重置码表
     resetTable() {
-      this.codeTableData.forEach(item => {
-        item.fillVal = ""
+      this.codeTableData.forEach((item) => {
+        item.fillVal = "";
       });
     },
     //问题提交缓存
     btnQuestionFormAdd() {
       let addForm = {
-        userName: storageSession.getItem('username')
-      }
+        userName: storageSession.getItem("username"),
+      };
 
-      this.codeTableData.forEach(item => {
+      this.codeTableData.forEach((item) => {
         if (item.isTime) {
-
-          addForm[item.strName] = parseTime(item.fillVal, "{yy}-{mm}-{dd}")
+          addForm[item.strName] = parseTime(item.fillVal, "{yy}-{mm}-{dd}");
         } else {
-          addForm[item.strName] = item.fillVal
+          addForm[item.strName] = item.fillVal;
         }
+      });
 
-      })
-
-      addNewProblem(addForm).then(msg => {
-        this.$message({
-          type: "success",
-          message: "录入成功"
-        })
-      }, err => {
-        console.log(err)
-      }).finally(() => {
-        this.resetTable()
-        this.$emit("updateList")
-        this.btnCancelDialog()
-      })
+      addNewProblem(addForm)
+        .then(
+          (msg) => {
+            this.$message({
+              type: "success",
+              message: "录入成功",
+            });
+          },
+          (err) => {
+            console.log(err);
+          }
+        )
+        .finally(() => {
+          this.resetTable();
+          this.$emit("updateList");
+          this.btnCancelDialog();
+        });
     },
     //检查是否填完
     btnIsFillAll() {
-      let isFill = false
-      this.codeTableData.forEach(item => {
+      let isFill = false;
+      this.codeTableData.forEach((item) => {
         if (item.fillVal == "") {
-          isFill = true
+          isFill = true;
         }
-      })
+      });
       if (isFill) {
         return this.$message({
           type: "warning",
-          message: "您还有内容没填完整!!"
-        })
+          message: "您还有内容没填完整!!",
+        });
       }
-      this.btnQuestionFormAdd()
-
+      this.btnQuestionFormAdd();
     },
     //取消父组件对话框
     btnCancelDialog() {
-      this.$emit("update:fatherDialogVisible", false)
-    }
-
+      this.$emit("update:fatherDialogVisible", false);
+    },
   },
 };
 </script>
 
-<style>
-</style>
+<style></style>

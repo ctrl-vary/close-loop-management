@@ -31,19 +31,19 @@
               </el-radio-group>
             </el-form-item>
             <el-form-item v-if="showFileName" label="文件名" prop="fileName">
-              <el-input v-model="formData.fileName" placeholder="请输入文件名" clearable />
+              <el-input
+                v-model="formData.fileName"
+                placeholder="请输入文件名"
+                clearable
+              />
             </el-form-item>
           </el-col>
         </el-form>
       </el-row>
 
       <div slot="footer">
-        <el-button @click="close">
-          取消
-        </el-button>
-        <el-button type="primary" @click="handleConfirm">
-          确定
-        </el-button>
+        <el-button @click="close"> 取消 </el-button>
+        <el-button type="primary" @click="handleConfirm"> 确定 </el-button>
       </div>
     </el-dialog>
   </div>
@@ -51,56 +51,61 @@
 <script>
 export default {
   inheritAttrs: false,
-  props: ['showFileName'],
+  props: ["showFileName"],
   data() {
     return {
       formData: {
         fileName: undefined,
-        type: 'file'
+        type: "file",
       },
       rules: {
-        fileName: [{
-          required: true,
-          message: '请输入文件名',
-          trigger: 'blur'
-        }],
-        type: [{
-          required: true,
-          message: '生成类型不能为空',
-          trigger: 'change'
-        }]
+        fileName: [
+          {
+            required: true,
+            message: "请输入文件名",
+            trigger: "blur",
+          },
+        ],
+        type: [
+          {
+            required: true,
+            message: "生成类型不能为空",
+            trigger: "change",
+          },
+        ],
       },
-      typeOptions: [{
-        label: '页面',
-        value: 'file'
-      }, {
-        label: '弹窗',
-        value: 'dialog'
-      }]
-    }
+      typeOptions: [
+        {
+          label: "页面",
+          value: "file",
+        },
+        {
+          label: "弹窗",
+          value: "dialog",
+        },
+      ],
+    };
   },
-  computed: {
-  },
+  computed: {},
   watch: {},
   mounted() {},
   methods: {
     onOpen() {
       if (this.showFileName) {
-        this.formData.fileName = `${+new Date()}.vue`
+        this.formData.fileName = `${+new Date()}.vue`;
       }
     },
-    onClose() {
-    },
+    onClose() {},
     close(e) {
-      this.$emit('update:visible', false)
+      this.$emit("update:visible", false);
     },
     handleConfirm() {
-      this.$refs.elForm.validate(valid => {
-        if (!valid) return
-        this.$emit('confirm', { ...this.formData })
-        this.close()
-      })
-    }
-  }
-}
+      this.$refs.elForm.validate((valid) => {
+        if (!valid) return;
+        this.$emit("confirm", { ...this.formData });
+        this.close();
+      });
+    },
+  },
+};
 </script>
