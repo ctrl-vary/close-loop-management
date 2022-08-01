@@ -32,10 +32,10 @@
           <template slot-scope="scope">
             <div v-for=" (dictitem, index) in scope.row.dictionaryItem " :key="index">
               <div v-if="dictitem.dictionaryItemValue">
-                <el-switch v-model="dictitem.status" @change="btnSwitchEvent(dictitem)" active-color="#13ce66" inactive-color="#ff4949" :active-value="0"
-                  :inactive-value="1">
+                <el-switch v-model="dictitem.status" @change="btnSwitchEvent(dictitem)" active-color="#13ce66"
+                  inactive-color="#ff4949" :active-value="0" :inactive-value="1">
                 </el-switch>
-                 {{ dictitem.dictionaryItemValue }} <el-button size="mini" type="text" icon="el-icon-delete"
+                {{ dictitem.dictionaryItemValue }} <el-button size="mini" type="text" icon="el-icon-delete"
                   @click="btnDeleteDicts(dictitem.id, dictitem.dictionaryItemValue)"></el-button>
               </div>
             </div>
@@ -43,9 +43,6 @@
         </el-table-column>
       </el-table>
     </el-row>
-
-
-
     <el-dialog :title="'当前字典类型:' + addNewCodeItemForm.dictionaryTypeName" :visible.sync="addCodeTableDialogVisible"
       width="40%">
       <el-form label-width="100px">
@@ -58,14 +55,11 @@
         <el-button type="primary" @click="btnAddDictionaryItem">确 定</el-button>
       </span>
     </el-dialog>
-
   </div>
-
-
 </template>
 
 <script>
-import {getCodeTable,deleteCodeTableById,addCodeTable,changeCodeTableState} from '@/api/tablemanage/getCodeTableInfo'
+import { getCodeTable, deleteCodeTableById, addCodeTable, changeCodeTableState } from '@/api/tablemanage/getCodeTableInfo'
 export default {
   name: 'TableManage',
   dicts: ['sys_normal_disable'],
@@ -84,7 +78,6 @@ export default {
         //字典项
         dictionaryItemValue: ""
       },
-
     }
   },
 
@@ -118,27 +111,27 @@ export default {
         dictionaryItemValue: this.addNewCodeItemForm.dictionaryItemValue
       })
       console.log(res)
-      if(res.msg=='success'){
-          this.$message({
-        type:"success",
-        message:res.msg
+      if (res.msg == 'success') {
+        this.$message({
+          type: "success",
+          message: res.msg
 
-      })
-      }else{
-            this.$message({
-        type:"warning",
-        message:res.msg
+        })
+      } else {
+        this.$message({
+          type: "warning",
+          message: res.msg
 
-      })
+        })
       }
-      
+
       this.addNewCodeItemForm.dictionaryItemValue = ""
       this.getCodeList()
       this.addCodeTableDialogVisible = false
     },
     //删除一个字典项
     async btnDeleteDicts(id, rowdictionaryItemValue) {
-    
+
       this.$confirm('此操作将永久删除该字典项, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -156,28 +149,26 @@ export default {
             message: "删除失败！！"
           })
         }
-
-        
       }).catch(() => {
         this.$message({
           type: 'info',
           message: '已取消删除'
         });
-        
-      }).finally(()=>this.getCodeList());
+
+      }).finally(() => this.getCodeList());
 
     },
     //修改变化
-   async btnSwitchEvent(info){
-     console.log(info)
-    // let status = info.status==1?0:1
-     const res = await changeCodeTableState({
-      status:info.status,
-      id:info.id
-     })
-     console.log(res)
-     this.getCodeList()
-     
+    async btnSwitchEvent(info) {
+      console.log(info)
+      // let status = info.status==1?0:1
+      const res = await changeCodeTableState({
+        status: info.status,
+        id: info.id
+      })
+      console.log(res)
+      this.getCodeList()
+
     }
 
   },

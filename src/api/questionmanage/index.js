@@ -27,10 +27,11 @@ export function getDeptInIssue(queryParams){
 }
 
 //打回问题
-export function getRepulse(quesId){
+export function getRepulse(params){
     return request({
-        url: `/problem/repulse/${quesId}`,
-        method: 'get'
+        url: `/problem/repulse`,
+        method: 'get',
+        params: params
       })
 }
 
@@ -42,10 +43,11 @@ export function postQuse(data){
       })
 }
 //验收问题 
-export function getQuesCheck(quesId){
+export function getQuesCheck(params){
     return request({
-        url: `/problem/check/${quesId}`,
-        method: 'get'
+        url: `/problem/check`,
+        method: 'get',
+        params: params
       })
 }
 // 本人获取证据接口

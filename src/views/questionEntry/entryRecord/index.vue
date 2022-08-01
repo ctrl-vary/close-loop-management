@@ -323,7 +323,6 @@ export default {
       console.log(res)
       this.nowQuestionNum = res.total
       this.total = res.total
-
       this.tableData = res.rows.map(item => {
         return {
           ...item,

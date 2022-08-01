@@ -70,7 +70,7 @@
         </el-table-column>
       </template>
     </result-table>
-      <!-- 分页 -->
+    <!-- 分页 -->
     <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize"
       @pagination="pageChangeEvent" />
     <!-- 证据更改 -->
@@ -114,17 +114,20 @@
         <el-table-column label="部门名称" prop="deptName"></el-table-column>
         <el-table-column label="到达部门时间" prop="receiveTimeF"></el-table-column>
         <el-table-column label="部门处理完毕时间" prop="processingTimeF"></el-table-column>
-
+        <el-table-column label="备注" prop="remarks"></el-table-column>
       </el-table>
 
 
     </el-dialog>
     <!-- 审核问题的查看 -->
     <el-dialog title="证据查看" :visible.sync="checkOnlyEvidenceVisible" width="30%">
-      <el-form>
+      <el-form label-width="90px">
         <el-form-item label="证据查看:"> <span>{{ tempEvidence.description }} </span> </el-form-item>
         <el-form-item v-for="(src, index) in tempEvidence.picurl" :key="index + src" label="照片:"> <img
             style="width:70%;height:120px ;" :src="src" alt=""> </el-form-item>
+        <el-form-item label="审核备注:" >
+          <el-input type="textarea" :rows="2" v-model=" checkParams.remarks"></el-input>
+        </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
@@ -133,18 +136,19 @@
       </span>
     </el-dialog>
     <!-- 继续下发对话框 -->
-    <el-dialog title="继续下发" :visible.sync="keepPostVisible" v-if="keepPostVisible"  width="25%">
+    <el-dialog title="继续下发" :visible.sync="keepPostVisible" v-if="keepPostVisible" width="25%">
       <el-form label-width="80px">
         <el-form-item label="部门选择">
-           <treeselect @select="eventTreeSelect" :options="deptOptions" :show-count="true" placeholder="请选择归属部门" />
+          <treeselect @select="eventTreeSelect" :options="deptOptions" :show-count="true" placeholder="请选择归属部门" />
         </el-form-item>
+
       </el-form>
-       <span slot="footer" class="dialog-footer">
+      <span slot="footer" class="dialog-footer">
         <el-button size="mini" type="danger" @click="btnConfirmeKeepPost(true)">确定下发</el-button>
         <el-button size="mini" type="success" @click="btnConfirmeKeepPost(false)">取消</el-button>
       </span>
     </el-dialog>
-    
+
   </div>
 
 
@@ -168,11 +172,11 @@ import {
 export default {
   components: {
     resultTable,
-     Treeselect
+    Treeselect
   },
   data() {
     return {
-       //时间学着帮助器
+      //时间学着帮助器
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -221,7 +225,8 @@ export default {
       tempEvidence: {
         tempId: "",
         description: "",
-        picurl: []
+        picurl: [],
+        remarks:""
       },
       //待处理的问题
       hanleQuesNum: 0,
@@ -247,9 +252,9 @@ export default {
       //部门树
       deptOptions: [],
       //部门树的信息
-      selectDeptName:undefined,
-      TempQuesId:"",
-       total: 2,
+      selectDeptName: undefined,
+      TempQuesId: "",
+      total: 2,
       queryParams: {
         pageSize: 10,
         pageNum: 1,
@@ -261,7 +266,13 @@ export default {
       },
       //时间选择
       timerValArr: [],
-      userId:""
+      userId: "",
+      //打回或者审核体
+      checkParams: {
+        quesId: "",
+        remarks: ""
+      }
+
 
 
     }
@@ -269,11 +280,11 @@ export default {
   created() {
     this.userId = storageSession.getItem('userId')
     this.queryParams.userId = this.userId
-     this.getTreeselect()
+    this.getTreeselect()
     this.getCloseQuesList(false)
     this.getDeptPostIssueList(true)
     this.getDeptInCheckList(false)
-   
+
   },
   methods: {
 
@@ -284,44 +295,44 @@ export default {
         this.deptOptions = response.data;
       });
     },
-    eventTreeSelect(node,instanceId){
-    this.selectDeptName = node.label
-    console.log( this.selectDeptName)
+    eventTreeSelect(node, instanceId) {
+      this.selectDeptName = node.label
+      console.log(this.selectDeptName)
     },
     //下发操作
-    btnConfirmeKeepPost(booleanVal){
-       if(booleanVal){
+    btnConfirmeKeepPost(booleanVal) {
+      if (booleanVal) {
         this.$confirm('确定要继续下发这个问题吗, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(async () => {
-        console.log("Jiekkk")
-       const res = await postQuse({
-        quesId:this.TempQuesId,
-        deptName:this.selectDeptName
-       })
-        this.$message({
-          type: "success",
-          message: "下发成功!"
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          console.log("Jiekkk")
+          const res = await postQuse({
+            quesId: this.TempQuesId,
+            deptName: this.selectDeptName
+          })
+          this.$message({
+            type: "success",
+            message: "下发成功!"
+          })
+          console.log(res)
+        }).catch(err => {
+          this.$message({
+            type: "info",
+            message: "取消了操作!"
+          })
+        }).finally(() => {
+          this.getDeptPostIssueList(true)
+          this.keepPostVisible = false
         })
-       console.log(res)
-      }).catch(err => {
+      } else {
         this.$message({
           type: "info",
           message: "取消了操作!"
         })
-       }).finally(()=>{
-            this.getDeptPostIssueList(true)
-            this.keepPostVisible = false
-       })
-    }else{
-      this.$message({
-          type: "info",
-          message: "取消了操作!"
-        })
-       this.keepPostVisible = false
-    }
+        this.keepPostVisible = false
+      }
     },
     //经手闭环问题列表
     async getCloseQuesList(booleanVal) {
@@ -385,7 +396,7 @@ export default {
         this.loading = true
         console.log(storageSession.getItem('username'))
         res = await getDeptInCheck(this.queryParams)
-         this.total = res.total
+        this.total = res.total
         this.tableData = res.rows.map(item => {
           return {
             ...item,
@@ -417,6 +428,8 @@ export default {
     },
     //打回或者通过
     btnGiveTheRes(bolleanVal) {
+      this.checkParams.quesId = this.tempEvidence.tempId
+      
       if (bolleanVal) {
         this.$confirm('这个问题将会验收，确定验收吗？', '提示', {
           confirmButtonText: '确定验收',
@@ -424,7 +437,9 @@ export default {
           type: 'warning'
         }).then(async () => {
 
-          const res = await getQuesCheck(this.tempEvidence.tempId)
+          const res = await getQuesCheck(
+            this.checkParams
+          )
           console.log(res)
           this.$message({
             type: "success",
@@ -452,7 +467,7 @@ export default {
           type: 'warning'
         }).then(async () => {
 
-          const res = await getRepulse(this.tempEvidence.tempId)
+          const res = await getRepulse(this.checkParams)
           console.log(res)
           this.$message({
             type: "warning",
@@ -469,6 +484,7 @@ export default {
           //刷新问题处理标志
           this.getDeptPostIssueList(false)
           this.checkOnlyEvidenceVisible = false
+          this.checkParams = {}
         })
 
 
@@ -497,6 +513,7 @@ export default {
         //传过打开接收的对话框
         this.tempEvidence.description = res.data.description
         this.tempEvidence.picurl = [...res.data.picurl]
+        this.tempEvidence.remarks = res.data.remarks
         this.checkEvidenceVisible = true
       }
       this.loading = false
@@ -631,19 +648,19 @@ export default {
       })
       this.processVisible = true
     },
-       //分页跟着table的不同调用不用的接口
+    //分页跟着table的不同调用不用的接口
     pageChangeEvent() {
       if (this.hanleTableCol == "handle") {
-       this.getDeptPostIssueList(true)
+        this.getDeptPostIssueList(true)
       } else if (this.hanleTableCol == "close") {
         this.getCloseQuesList(true)
       } else {
         this.getDeptInCheckList(true)
       }
     },
-       //重置
+    //重置
     resetQueryParams() {
-       this.timerValArr = []
+      this.timerValArr = []
       Object.keys(this.queryParams).forEach(key => {
         this.queryParams[key] = ""
       })
@@ -658,28 +675,28 @@ export default {
       this.queryParams.endTime = this.timerValArr[1]
       switch (this.hanleTableCol) {
         case "handle":
-         this.getDeptPostIssueList(true)
+          this.getDeptPostIssueList(true)
           break;
-       case "close":
-            this.getCloseQuesList(true)
+        case "close":
+          this.getCloseQuesList(true)
           break;
         default:
-         this.getDeptInCheckList(true)
+          this.getDeptInCheckList(true)
           break;
       }
     },
     //重置加搜索
-    btnResetSearch(){
+    btnResetSearch() {
       this.resetQueryParams()
-       switch (this.hanleTableCol) {
+      switch (this.hanleTableCol) {
         case "handle":
-         this.getDeptPostIssueList(true)
+          this.getDeptPostIssueList(true)
           break;
-       case "close":
-            this.getCloseQuesList(true)
+        case "close":
+          this.getCloseQuesList(true)
           break;
         default:
-         this.getDeptInCheckList(true)
+          this.getDeptInCheckList(true)
           break;
       }
     }
